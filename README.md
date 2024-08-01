@@ -126,7 +126,13 @@
 
 Установил зависимости, сконфигурировал кластер с запуском билдера
 
-![Скриншот 8-7](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-18-29.png)
+![Скриншот 9](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-18-29.png)
+
+![Скриншот 10](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-20-18.png)
+
+![Скриншот 11](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-21-47.png)
+
+### Установка
 
 Установил кластер при помощи **Ansible**
 
@@ -134,22 +140,22 @@
 ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 ```
 
-Для доступа к кластеру извне добавил параметр `supplementary_addresses_in_ssl_keys: [внешний IP control plane]`  
+![Скриншот 12](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-37-51.png)
+
+### Организация внешнего доступа
+
+Для доступа к кластеру извне добавил параметр `supplementary_addresses_in_ssl_keys: [внешний IP control plane]`
 в файл `inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
 
-Получил ожидаемый результат:
+Получил желаемый результат:
 
 1. Работоспособный Kubernetes кластер.
 
-![Скриншот 9](https://github.com/PugachEV72/Images/blob/master/2024-07-14_11-19-35.png)
+2. В файле `~/.kube/config` на локальной машине находятся данные для доступа к кластеру.
 
-![Скриншот 10](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-20-18.png)
+![Скриншот 12-1](https://github.com/PugachEV72/Images/blob/master/2024-07-28_13-04-46.png)
 
-![Скриншот 11](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-21-47.png)
-
-![Скриншот 12](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-37-51.png)
-
-2. В файле `~/.kube/config` находятся данные для доступа к кластеру.
+![Скриншот 12-2](https://github.com/PugachEV72/Images/blob/master/2024-07-28_13-07-15.png)
 
 3. Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок.
 
