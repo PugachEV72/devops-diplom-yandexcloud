@@ -92,6 +92,7 @@
 Убеждаемся, что ВМ также распределены по разным подсетям
 
 ![Скриншот 8-5](https://github.com/PugachEV72/Images/blob/master/2024-08-01_12-46-00.png)
+
 ---
 
 ## Создание Kubernetes кластера
@@ -117,7 +118,26 @@
 Создал Kubernetes кластер на базе предварительно созданной инфраструктуры. Обеспечил доступ к ресурсам  
 из Интернета. Для выполнения данного задания использовал **Kubespray**.
 
-Ожидаемый результат:
+### Подготовка к установке:
+
+Склонировал репозиторий
+
+![Скриншот 8-6](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-07-12.png)
+
+Установил зависимости, сконфигурировал кластер с запуском билдера
+
+![Скриншот 8-7](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-18-29.png)
+
+Установил кластер при помощи **Ansible**
+
+```
+ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
+```
+
+Для доступа к кластеру извне добавил параметр `supplementary_addresses_in_ssl_keys: [внешний IP control plane]`  
+в файл `inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
+
+Получил ожидаемый результат:
 
 1. Работоспособный Kubernetes кластер.
 
@@ -130,6 +150,7 @@
 ![Скриншот 12](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-37-51.png)
 
 2. В файле `~/.kube/config` находятся данные для доступа к кластеру.
+
 3. Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок.
 
 ![Скриншот 13](https://github.com/PugachEV72/Images/blob/master/2024-07-14_13-43-45.png)
