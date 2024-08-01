@@ -144,7 +144,7 @@ ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 
 ### Организация внешнего доступа
 
-Для доступа к кластеру извне добавил параметр `supplementary_addresses_in_ssl_keys: [внешний IP control plane]`
+Для доступа к кластеру извне добавил параметр `supplementary_addresses_in_ssl_keys: [внешний IP control plane]`  
 в файл `inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
 
 Получил желаемый результат:
@@ -242,8 +242,29 @@ ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 ![Скриншот 20](https://github.com/PugachEV72/Images/blob/master/2024-07-14_20-38-12.png)
 
 ![Скриншот 21](https://github.com/PugachEV72/Images/blob/master/2024-07-14_20-52-24.png)
+---
 
-2. Http доступ к тестовому приложению.
+### Дополнение:
+
+В ходе проверки данного этапа был выявлен недочет в получении доступа из локального окружения.  
+Доступ к развернутым в кластере приложениям мониторинга можно организовать при помощи создания  
+сервисов вида NodePort, и получать доступ по внешним IP-адресам **любой** из нод кластера.  
+
+Для этого внесем изменения в файл `monitoring.jsonnet`
+
+![Скриншот 22](https://github.com/PugachEV72/Images/blob/master/2024-07-31_13-08-40.png)
+
+Получили желаемый результат
+
+![Скриншот 23](https://github.com/PugachEV72/Images/blob/master/2024-07-31_13-37-58.png)
+
+![Скриншот 24](https://github.com/PugachEV72/Images/blob/master/2024-07-31_14-58-07.png)
+
+2. Http доступ к тестовому приложению организован подобным образом.
+
+![Скриншот 25](https://github.com/PugachEV72/Images/blob/master/2024-07-29_14-06-36.png)
+
+![Скриншот 26](https://github.com/PugachEV72/Images/blob/master/2024-07-29_14-07-56.png)
 
 ---
 
@@ -257,6 +278,20 @@ ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 2. Автоматический деплой нового docker образа.
 
 ### Решение:
+
+![Скриншот 22]()
+
+![Скриншот 22]()
+
+![Скриншот 22]()
+
+![Скриншот 22]()
+
+![Скриншот 22]()
+
+![Скриншот 22]()
+
+![Скриншот 22]()
 
 Для выполнения этого задания предполагаю использовать ci/cd `jenkins`.
 ---
