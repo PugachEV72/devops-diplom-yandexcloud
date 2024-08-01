@@ -248,11 +248,13 @@ ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 
 В ходе проверки данного этапа был выявлен недочет в получении доступа из локального окружения.  
 Доступ к развернутым в кластере приложениям мониторинга можно организовать при помощи создания  
-сервисов вида NodePort, и получать доступ по внешним IP-адресам **любой** из нод кластера.  
+сервисов вида `NodePort`, и получать доступ по внешним IP-адресам **любой** из нод кластера.  
 
 Для этого внесем изменения в файл `monitoring.jsonnet`
 
 ![Скриншот 22](https://github.com/PugachEV72/Images/blob/master/2024-07-31_13-08-40.png)
+
+Перезапустим сборку `Kube-Prometeus`
 
 Получили желаемый результат
 
@@ -260,7 +262,7 @@ ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 
 ![Скриншот 24](https://github.com/PugachEV72/Images/blob/master/2024-07-31_14-58-07.png)
 
-2. Http доступ к тестовому приложению организован подобным образом.
+2. Http доступ к тестовому приложению организован подобным же образом.
 
 ![Скриншот 25](https://github.com/PugachEV72/Images/blob/master/2024-07-29_14-06-36.png)
 
@@ -270,30 +272,105 @@ ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b -v
 
 ## Установка и настройка CI/CD
 
-Осталось настроить ci/cd систему для автоматической сборки docker image и деплоя приложения при изменении кода.
+Осталось настроить ci/cd систему для автоматической сборки docker image и деплоя приложения  
+при изменении кода.
 
 Цель:
 
 1. Автоматическая сборка docker образа при коммите в репозиторий с тестовым приложением.
 2. Автоматический деплой нового docker образа.
 
+Можно использовать teamcity, jenkins, GitLab CI или GitHub Actions.
+
+Ожидаемый результат:
+
+Интерфейс ci/cd сервиса доступен по http.  
+При любом коммите в репозиторие с тестовым приложением происходит сборка и отправка в регистр  
+Docker образа. При создании тега (например, v1.0.0) происходит сборка и отправка с соответствующим  
+label в регистри, а также деплой соответствующего Docker образа в кластер Kubernetes.
+
 ### Решение:
 
-![Скриншот 22]()
+Для автоматической сборки `docker image` и деплоя приложения при изменении кода буду использовать  
+**Github actions**
 
-![Скриншот 22]()
+Для работы в `github action` требуются некоторые учетные данные.  
+Поэтому создаем в Dockerhub секретный токен.
 
-![Скриншот 22]()
+![Скриншот 27](https://github.com/PugachEV72/Images/blob/master/2024-07-22_22-13-51.png)
 
-![Скриншот 22]()
+Затем создадим в `Github` секреты для доступа к `DockerHub`
 
-![Скриншот 22]()
+![Скриншот 28](https://github.com/PugachEV72/Images/blob/master/2024-07-22_22-34-53.png)
 
-![Скриншот 22]()
+Рабочие процессы `GitHub Actions` определяем в файлах YAML в `.github/workflows` каталоге репозитория  
+с тестовым приложением [Workflows](https://github.com/PugachEV72/app-nginx-static/tree/main/.github/workflows)
 
-![Скриншот 22]()
+Создадим два workflow
 
-Для выполнения этого задания предполагаю использовать ci/cd `jenkins`.
+1. Для сборки и отправки в регистр Docker образа при любом коммите в репозитории с тестовым приложением
+
+[Build and push](https://github.com/PugachEV72/app-nginx-static/blob/main/.github/workflows/ci_deployment.yaml)
+
+Отправка коммита
+
+![Скриншот 29](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-03-30.png)
+
+Сборка образа и отправка в DockerHub
+
+![Скриншот 30](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-06-40.png)
+
+![Скриншот 31](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-07-16.png)
+
+![Скриншот 32](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-09-02.png)
+
+2. Для сборки и отправки с соответствующим label в регистри, а также деплоя соответствующего Docker образа  
+в кластер Kubernetes при создании тега (например, v1.0.0)
+
+[Build, push and deploy](https://github.com/PugachEV72/app-nginx-static/blob/main/.github/workflows/ci_cd_deployment.yaml)
+
+Отправка тега
+
+![Скриншот 33](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-12-26.png)
+
+Сборка образа соответствующей версии, отправка в DockerHub и деплой в кластер Kubernetes
+
+![Скриншот 34](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-13-30.png)
+
+![Скриншот 35](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-13-46.png)
+
+![Скриншот 36](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-40-25.png)
+
+Dockerhub
+
+![Скриншот 37](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-22-10.png)
+
+Приложение
+
+![Скриншот 38](https://github.com/PugachEV72/Images/blob/master/2024-07-30_03-18-36.png)
+
+---
+
+## Результат выполнения дипломного проекта
+
+При внесении изменений в тестовое приложение и создании тега **v1.0.3** система отрабатывает корректно
+
+![Скриншот 39](https://github.com/PugachEV72/Images/blob/master/2024-07-31_15-02-36.png)
+
+![Скриншот 40](https://github.com/PugachEV72/Images/blob/master/2024-07-31_15-03-06.png)
+
+![Скриншот 41](https://github.com/PugachEV72/Images/blob/master/2024-07-31_15-04-25.png)
+
+Состояние кластера
+
+![Скриншот 42](https://github.com/PugachEV72/Images/blob/master/2024-08-01_00-01-00.png)
+
+Приложение
+
+![Скриншот 43](https://github.com/PugachEV72/Images/blob/master/2024-07-31_15-01-37.png)
+
+![Скриншот 44](https://github.com/PugachEV72/Images/blob/master/2024-07-31_14-59-09.png)
+
 ---
 
 
